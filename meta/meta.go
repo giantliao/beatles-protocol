@@ -2,11 +2,13 @@ package meta
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"errors"
 )
 
 type Meta struct {
-	Content []byte
+	Content  []byte
+	ContentS string
 }
 
 func (m *Meta) Marshal(sender string, cipherTxt []byte) {
@@ -17,14 +19,22 @@ func (m *Meta) Marshal(sender string, cipherTxt []byte) {
 
 	var lSender byte = byte(len(sender))
 	m.Content = append(m.Content, lSender)
-	m.Content = append(m.Content, ([]byte(sender))...)
+	m.Content = append(m.Content, []byte(sender)...)
 	m.Content = append(m.Content, cipherTxt...)
+
+	m.ContentS = base64.StdEncoding.EncodeToString(m.Content)
 
 	return
 
 }
 
 func (m *Meta) UnMarshal() (sender string, cipherTxt []byte, err error) {
+
+	m.Content, err = base64.StdEncoding.DecodeString(m.ContentS)
+	if err != nil {
+		return "", nil, err
+	}
+
 	if len(m.Content) <= 129 {
 		return "", nil, errors.New("meta data error")
 	}
