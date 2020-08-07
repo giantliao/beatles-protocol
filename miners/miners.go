@@ -34,3 +34,21 @@ func (bm *BestMiners) UnMarshal(key []byte, data []byte) error {
 	}
 	return nil
 }
+
+func (m *Miner) Marshal(key []byte) ([]byte, error) {
+	j, _ := json.Marshal(*m)
+	return util.Encrypt(key, j)
+}
+
+func (m *Miner) UnMarshal(key []byte, data []byte) error {
+	plainTxt, err := util.Decrypt(key, data)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(plainTxt, m)
+	if err != nil {
+		return err
+	}
+	return nil
+}
