@@ -14,9 +14,15 @@ type StreamConn struct {
 	net.Conn
 }
 
+func NewStreamBuf() []byte {
+	buf := make([]byte, bufferSize)
+
+	return buf
+}
+
 func ShadowLen(l int32) (int, error) {
 	if l > bufferSize {
-		return 0, errors.New("length must less than :" + strconv.Itoa(bufferSize))
+		return 0, errors.New("length must less than :" + strconv.Itoa(int(bufferSize)))
 	}
 
 	rand.Seed(tools.GetNowMsTime())
@@ -24,7 +30,7 @@ func ShadowLen(l int32) (int, error) {
 
 	l = l ^ int32(randn)
 
-	shadowlen := (randn << bufferBitsSize) | l
+	shadowlen := (randn << int(bufferBitsSize)) | int(l)
 
 	return shadowlen, nil
 }
