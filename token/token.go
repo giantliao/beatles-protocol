@@ -5,13 +5,13 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 )
 
-func TokenCovert(tk string) (string,error) {
-	tkbytes,err:=hex.DecodeString(tk)
-	if err!=nil{
+func TokenCovert(tk string) (string, error) {
+	tkbytes, err := hex.DecodeString(tk)
+	if err != nil {
 		return "", err
 	}
 
-	return "at"+base58.Encode(tkbytes),nil
+	return "at" + base58.Encode(tkbytes), nil
 }
 
 func TokenRevert(tk string) string {
@@ -20,8 +20,3 @@ func TokenRevert(tk string) string {
 
 	return hex.EncodeToString(tkbytes)
 }
-
-
-
-
-
