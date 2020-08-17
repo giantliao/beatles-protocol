@@ -21,6 +21,7 @@ type BootsTrapMiners struct {
 	BeatlesTrxAddr    string                 `json:"beatles_trx_addr"`
 	EthAccPoint       string                 `json:"eth_acc_point"`
 	TrxAccPoint       string                 `json:"trx_acc_point"`
+	Price             float64                `json:"price"`
 	NextDownloadPoint []*GithubDownLoadPoint `json:"next_download_point"`
 }
 
