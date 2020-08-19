@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/kprc/libeth/account"
 	"github.com/kprc/libeth/util"
+	"strconv"
 )
 
 type LicenseContent struct {
@@ -66,6 +67,25 @@ type NoncePriceSig struct {
 	Content NoncePriceContent `json:"content"`
 }
 
+func float64toString(f float64) string {
+	return strconv.FormatFloat(f, 'f', -1, 64)
+}
+
+func (nps *NoncePriceSig) String() string {
+	msg := ""
+	msg += "sig: " + nps.Sig
+	msg += "\r\n" + "nonce: " + strconv.FormatUint(nps.Content.Nonce, 10)
+	msg += "\r\n" + "Receiver: " + nps.Content.Receiver.String()
+	msg += "\r\n" + "EthAddr: " + nps.Content.EthAddr.String()
+	msg += "\r\n" + "PricePerMonth: " + float64toString(nps.Content.PricePerMonth)
+	msg += "\r\n" + "Month: " + strconv.FormatInt(nps.Content.Month, 10)
+	msg += "\r\n" + "Total: " + float64toString(nps.Content.Total)
+	msg += "\r\n" + "TotalEth: " + float64toString(nps.Content.TotalEth)
+	msg += "\r\n" + "EthPrice: " + float64toString(nps.Content.EthPrice)
+
+	return msg
+}
+
 func (nps *NoncePriceSig) Sign(sig func([]byte) []byte) error {
 	j, err := json.Marshal(nps.Content)
 	if err != nil {
@@ -108,6 +128,17 @@ type LicenseRenew struct {
 	Name           string        `json:"name"`
 	Email          string        `json:"email"`
 	Cell           string        `json:"cell"`
+}
+
+func (lr *LicenseRenew) String() string {
+	msg := ""
+	msg += "\r\n" + "EthTransaction: " + lr.EthTransaction.String()
+	msg += "\r\n" + "Name: " + lr.Name
+	msg += "\r\n" + "Email: " + lr.Email
+	msg += "\r\n" + "Cell: " + lr.Cell
+	msg += "\r\n" + "TxSig: \r\n" + (&lr.TXSig).String()
+
+	return msg
 }
 
 func (lr *LicenseRenew) Marshal(key []byte) ([]byte, error) {
