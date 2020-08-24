@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/kprc/libeth/account"
 	"github.com/kprc/libeth/util"
+	"github.com/kprc/nbsnetwork/tools"
 	"strconv"
 )
 
@@ -22,6 +23,20 @@ type LicenseContent struct {
 type License struct {
 	Signature string         `json:"signature"`
 	Content   LicenseContent `json:"content"`
+}
+
+func (l *License)String() string  {
+	msg := ""
+	msg += "sig: " + l.Signature
+
+	msg += "\r\n" + "Receiver: " + l.Content.Receiver.String()
+	msg += "\r\n" + "Provider: " + l.Content.Provider.String()
+	msg += "\r\n" + "Name: " + l.Content.Name
+	msg += "\r\n" + "Email: " + l.Content.Email
+	msg += "\r\n" + "Cell: " + l.Content.Cell
+	msg += "\r\n" + "Expire: " + tools.Int64Time2String(l.Content.ExpireTime)
+
+	return msg
 }
 
 type NoncePrice struct {
