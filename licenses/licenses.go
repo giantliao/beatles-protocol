@@ -25,7 +25,7 @@ type License struct {
 	Content   LicenseContent `json:"content"`
 }
 
-func (l *License)String() string  {
+func (l *License) String() string {
 	msg := ""
 	msg += "sig: " + l.Signature
 
