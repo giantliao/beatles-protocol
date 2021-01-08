@@ -2,6 +2,7 @@ package miners
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kprc/libeth/account"
 	"github.com/kprc/libeth/util"
 )
@@ -11,6 +12,16 @@ type Miner struct {
 	Port     int                   `json:"port"`
 	Location string                `json:"location"`
 	MinerId  account.BeatleAddress `json:"miner_id"`
+}
+
+func (m *Miner)String() string  {
+	msg := ""
+	msg += fmt.Sprintf("%-50s", m.MinerId.String())
+	msg += fmt.Sprintf("%-18s", m.Ipv4Addr)
+	msg += fmt.Sprintf("%-7d", m.Port)
+	msg += fmt.Sprintf("%-12s", m.Location)
+
+	return msg
 }
 
 type BestMiners struct {

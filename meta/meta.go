@@ -13,6 +13,7 @@ type Meta struct {
 
 func (m *Meta) Marshal(sender string, cipherTxt []byte) {
 	var randbytes [128]byte
+
 	rand.Read(randbytes[:])
 
 	m.Content = randbytes[:]

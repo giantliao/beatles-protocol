@@ -63,23 +63,18 @@ func (cc *CipherConn) Read(b []byte) (n int, err error) {
 	if err == io.EOF && n == 0 {
 		return 0, io.EOF
 	}
-	//fmt.Println("read cipher:",hex.EncodeToString(b[:n]))
+
 	var plaintxt []byte
 	plaintxt = util.Decrypt2(cc.decStream, b[:n])
-
-	//fmt.Println("read plain:",hex.EncodeToString(plaintxt))
 
 	return len(plaintxt), nil
 }
 
 func (cc *CipherConn) Write(b []byte) (n int, err error) {
-
-	//fmt.Println("wirte plain:",hex.EncodeToString(b))
-
 	cipherTxt := util.Encrypt2(cc.encStream, b)
 
 	lc := len(cipherTxt)
-	//fmt.Println("write cipher:",hex.EncodeToString(cipherTxt))
+
 	n, err = cc.Conn.Write(cipherTxt)
 	if (err != nil && err != io.EOF) || lc != n {
 		return 0, errors.New("write cipherTxt error")
