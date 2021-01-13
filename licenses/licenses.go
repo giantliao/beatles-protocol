@@ -42,7 +42,8 @@ func (l *License) String() string {
 type NoncePrice struct {
 	Nonce    uint64                `json:"nonce"`
 	Receiver account.BeatleAddress `json:"receiver"`
-	EthAddr  common.Address        `json:"eth_addr"`
+	Payer    common.Address        `json:"payer"`
+	PayTyp   int 			   		`json:"pay_typ"`
 	Month    int64                 `json:"month"`
 }
 
@@ -64,17 +65,29 @@ func (np *NoncePrice) UnMarshal(key []byte, data []byte) error {
 	return nil
 }
 
+
+const(
+	PayTypETH  int = iota
+	PayTypBTLC
+	PayTypTRX
+	PayTypTrxUsd
+)
+
+var gPayType []string = []string{"eth","btlc","trx","trx-usdt"}
+
+
 //Total = PricePerMonth * Month
 //TotalEth = Total/EthPrice
 type NoncePriceContent struct {
-	Nonce         uint64                `json:"nonce"`
-	Receiver      account.BeatleAddress `json:"receiver"`
-	EthAddr       common.Address        `json:"eth_addr"`
-	PricePerMonth float64               `json:"price_per_month"`
-	Month         int64                 `json:"month"`
-	Total         float64               `json:"total"`
-	TotalEth      float64               `json:"total_eth"`
-	EthPrice      float64               `json:"eth_price"`
+	Nonce         	uint64                `json:"nonce"`
+	Receiver      	account.BeatleAddress `json:"receiver"`
+	Payer         	common.Address        `json:"payer"`
+	PricePerMonth 	float64               `json:"price_per_month"`
+	Month         	int64                 `json:"month"`
+	Total         	float64               `json:"total"`
+	TotalPrice      float64               `json:"total_price"`
+	MarketPrice      float64              `json:"market_price"`
+	PayTyp           int               	   `json:"pay_typ"`
 }
 
 type NoncePriceSig struct {
@@ -91,12 +104,13 @@ func (nps *NoncePriceSig) String() string {
 	msg += "sig: " + nps.Sig
 	msg += "\r\n" + "nonce: " + strconv.FormatUint(nps.Content.Nonce, 10)
 	msg += "\r\n" + "Receiver: " + nps.Content.Receiver.String()
-	msg += "\r\n" + "EthAddr: " + nps.Content.EthAddr.String()
+	msg += "\r\n" + "Payer: " + nps.Content.Payer.String()
 	msg += "\r\n" + "PricePerMonth: " + float64toString(nps.Content.PricePerMonth)
 	msg += "\r\n" + "Month: " + strconv.FormatInt(nps.Content.Month, 10)
 	msg += "\r\n" + "Total: " + float64toString(nps.Content.Total)
-	msg += "\r\n" + "TotalEth: " + float64toString(nps.Content.TotalEth)
-	msg += "\r\n" + "EthPrice: " + float64toString(nps.Content.EthPrice)
+	msg += "\r\n" + "TotalPrice: " + float64toString(nps.Content.TotalPrice)
+	msg += "\r\n" + "MarketPrice: " + float64toString(nps.Content.MarketPrice)
+	msg += "\r\n" + "PayType:" + gPayType[nps.Content.PayTyp]
 
 	return msg
 }
@@ -139,15 +153,16 @@ func (nps *NoncePriceSig) UnMarshal(key []byte, data []byte) error {
 
 type LicenseRenew struct {
 	TXSig          NoncePriceSig `json:"tx_sig"`
-	EthTransaction common.Hash   `json:"eth_transaction"`
+	TxStr          string        `json:"tx_str"`
 	Name           string        `json:"name"`
 	Email          string        `json:"email"`
 	Cell           string        `json:"cell"`
 }
 
+
 func (lr *LicenseRenew) String() string {
 	msg := ""
-	msg += "\r\n" + "EthTransaction: " + lr.EthTransaction.String()
+	msg += "\r\n" + "EthTransaction: " + lr.TxStr
 	msg += "\r\n" + "Name: " + lr.Name
 	msg += "\r\n" + "Email: " + lr.Email
 	msg += "\r\n" + "Cell: " + lr.Cell
@@ -193,3 +208,53 @@ func (l *License) UnMarshal(key []byte, data []byte) error {
 
 	return nil
 }
+
+type FreshLicenseReq struct {
+	Receiver account.BeatleAddress
+}
+
+func (fl *FreshLicenseReq)Marshal(key []byte) ([]byte, error)  {
+	j,_ := json.Marshal(*fl)
+	return util.Encrypt(key,j)
+}
+
+func (fl *FreshLicenseReq)UnMarshal(key ,data []byte) error  {
+	plainTxt, err := util.Decrypt(key,data)
+	if err!=nil {
+		return err
+	}
+
+	err = json.Unmarshal(plainTxt,fl)
+	if err!=nil{
+		return err
+	}
+
+	return nil
+}
+
+type FreshLicensResult struct {
+	TxStr string `json:"tx_str"`
+	License
+}
+
+
+func (flr *FreshLicensResult)Marshal(key []byte) ([]byte, error)  {
+	j,_ := json.Marshal(*flr)
+	return util.Encrypt(key,j)
+}
+
+func (flr *FreshLicensResult)UnMarshal(key ,data []byte) error  {
+	plainTxt, err := util.Decrypt(key,data)
+	if err!=nil {
+		return err
+	}
+
+	err = json.Unmarshal(plainTxt,flr)
+	if err!=nil{
+		return err
+	}
+
+	return nil
+}
+
+
